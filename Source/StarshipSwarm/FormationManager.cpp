@@ -55,7 +55,7 @@ void AFormationManager::BeginPlay()
                 AliveEnemies++;
 
                 // Bind to the enemy's death event
-                SpawnedEnemy->OnEnemyKilled.AddDynamic(this, &AFormationManager::OnEnemyDestroyed);
+                SpawnedEnemy->OnEnemyKilled.AddDynamic(this, &AFormationManager::HandleEnemyDeath);
             }
         }
     }
@@ -74,31 +74,13 @@ void AFormationManager::Tick(float DeltaTime)
     SetActorLocation(InitialLocation + FVector(HoverX, 0.f, HoverZ));
 }
 
-void AFormationManager::OnEnemyDestroyed(AActor* DestroyedActor)
+void AFormationManager::HandleEnemyDeath()
 {
     AliveEnemies--;
 
-    UE_LOG(LogTemp, Warning, TEXT("Enemy destroyed. %d still alive"), AliveEnemies);
-
+    // When last enemy dies → wave cleared
     if (AliveEnemies <= 0)
     {
-        AdvanceToNextWave();
+        OnFormationCleared.Broadcast();
     }
 }
-
-void AFormationManager::AdvanceToNextWave()
-{
-    CurrentWaveIndex++;
-
-    if (CurrentWaveIndex >= RowSettings.Num())
-    {
-        UE_LOG(LogTemp, Warning, TEXT("All waves completed!"));
-        return;
-    }
-
-    UE_LOG(LogTemp, Warning, TEXT("Starting Wave %d"), CurrentWaveIndex);
-
-    SpawnWave(RowSettings[CurrentWaveIndex]);
-}
-
-

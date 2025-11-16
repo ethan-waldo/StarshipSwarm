@@ -8,15 +8,6 @@
 // Delegate for notifying when all enemies in the formation are dead
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFormationCleared);
 
-
-int32 AliveEnemies = 0;
-
-UFUNCTION()
-void OnEnemyDestroyed(AActor* DestroyedActor);
-
-void AdvanceToNextWave();
-
-
 UCLASS()
 class STARSHIPSWARM_API AFormationManager : public AActor
 {
@@ -43,15 +34,6 @@ public:
     // Let WaveManager bind to this
     UPROPERTY(BlueprintAssignable, Category="Formation")
     FOnFormationCleared OnFormationCleared;
-    
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    int32 CurrentWaveIndex = 0;
-    int32 AliveEnemies = 0;
-    
-    UFUNCTION()
-    void OnEnemyDestroyed(AActor* DestroyedActor);
-
-    void AdvanceToNextWave();
 
 private:
     FVector InitialLocation;
