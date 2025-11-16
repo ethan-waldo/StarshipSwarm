@@ -1,62 +1,52 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+
 #include "FormationManager.h"
-#include "Enemy.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
 
 // Sets default values
 AFormationManager::AFormationManager()
 {
-    // Allow this actor to tick so we can animate the formation
-    PrimaryActorTick.bCanEverTick = true;
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
 }
 
 // Called when the game starts or when spawned
 void AFormationManager::BeginPlay()
 {
     Super::BeginPlay();
-
+    
     InitialLocation = GetActorLocation();
+    
     const FVector Origin = GetActorLocation();
-
-    AliveEnemies = 0;
-
+    
     // Loop through rows
     for (int32 RowIndex = 0; RowIndex < RowSettings.Num(); RowIndex++)
     {
         const FEnemyRowSettings& Settings = RowSettings[RowIndex];
-
+        
         if (!Settings.EnemyClass || Settings.EnemyCount <= 0)
         {
             continue;
         }
-
+        
         const int32 Count = Settings.EnemyCount;
-
+        
         // ★★★ CENTER OFFSET FORMULA ★★★
         float CenterOffset = ((Count - 1) * EnemySpacing) / 2.0f;
-
-        // Loop through enemies in the row
+        
+        // Loop through enemies in row
         for (int32 ColIndex = 0; ColIndex < Count; ColIndex++)
         {
             float X = RowIndex * RowSpacing;
             float Y = (ColIndex * EnemySpacing) - CenterOffset;
-
+            
             FVector SpawnLocation = Origin + FVector(X, Y, 0);
             FTransform SpawnTransform(FRotator::ZeroRotator, SpawnLocation);
-
-            // Spawn enemy
-            AEnemy* SpawnedEnemy = GetWorld()->SpawnActor<AEnemy>(Settings.EnemyClass, SpawnTransform);
-
-            if (SpawnedEnemy)
-            {
-                // Count this enemy
-                AliveEnemies++;
-
-                // Bind to the enemy's death event
-                SpawnedEnemy->OnEnemyKilled.AddDynamic(this, &AFormationManager::HandleEnemyDeath);
-            }
+            
+            GetWorld()->SpawnActor<AActor>(Settings.EnemyClass, SpawnTransform);
         }
     }
 }
@@ -74,13 +64,6 @@ void AFormationManager::Tick(float DeltaTime)
     SetActorLocation(InitialLocation + FVector(HoverX, 0.f, HoverZ));
 }
 
-void AFormationManager::HandleEnemyDeath()
-{
-    AliveEnemies--;
 
-    // When last enemy dies → wave cleared
-    if (AliveEnemies <= 0)
-    {
-        OnFormationCleared.Broadcast();
-    }
-}
+
+
