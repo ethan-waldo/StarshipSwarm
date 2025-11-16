@@ -44,7 +44,10 @@ void AFormationManager::BeginPlay()
             float Y = (ColIndex * EnemySpacing) - CenterOffset;
             
             FVector SpawnLocation = Origin + FVector(X, Y, 0);
-            FTransform SpawnTransform(FRotator::ZeroRotator, SpawnLocation);
+            
+            FRotator SpawnRotation(0.f, 180.f, 0.f);
+            
+            FTransform SpawnTransform(SpawnRotation, SpawnLocation);
             
             GetWorld()->SpawnActor<AActor>(Settings.EnemyClass, SpawnTransform);
         }
