@@ -9,7 +9,7 @@
 AFormationManager::AFormationManager()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 }
 
@@ -17,6 +17,8 @@ AFormationManager::AFormationManager()
 void AFormationManager::BeginPlay()
 {
     Super::BeginPlay();
+    
+    InitialLocation = GetActorLocation();
     
     const FVector Origin = GetActorLocation();
     
@@ -48,6 +50,20 @@ void AFormationManager::BeginPlay()
         }
     }
 }
+
+void AFormationManager::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    Time += DeltaTime;
+
+    // Smooth hovering motion
+    float HoverX = FMath::Sin(Time * 0.5f) * 100.f;
+    float HoverZ = FMath::Sin(Time * 0.8f) * 40.f;
+
+    SetActorLocation(InitialLocation + FVector(HoverX, 0.f, HoverZ));
+}
+
 
 
 
